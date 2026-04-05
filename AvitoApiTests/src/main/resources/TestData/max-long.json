@@ -1,0 +1,10 @@
+{
+  "sellerID": {{sellerId}},
+  "name": "Test item",
+  "price": 9223372036854775807,
+  "statistics": {
+    "likes": 1,
+    "viewCount": 10,
+    "contacts": 2
+  }
+}

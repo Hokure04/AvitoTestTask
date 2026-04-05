@@ -3,38 +3,30 @@ package org.example.Api.tests;
 import io.restassured.response.Response;
 import org.example.Api.BaseApiTest;
 import org.example.Api.ItemApiClient;
-import org.example.Dto.ItemDTO;
-import org.example.Dto.ItemRequest;
-import org.example.Dto.StatisticsDTO;
+import org.example.Dto.ItemResponse;
+import org.example.Utils.ItemDataProvider;
+import org.example.Utils.SellerIdGenerator;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CreateItemTests extends BaseApiTest {
 
     private final ItemApiClient itemApiClient = new ItemApiClient();
 
     @Test
-    public void createItemShouldReturnCreatedItemAccordingToContract() {
-        ItemRequest request = new ItemRequest(
-                123456,
-                "Test item",
-                1000,
-                new StatisticsDTO(1, 10, 2)
-        );
+    void CreateItemSuccessfully() {
+        int sellerId = SellerIdGenerator.generateSellerId();
 
-        Response response = itemApiClient.createItem(request);
+        String body = ItemDataProvider.validItem(sellerId);
+        System.out.println(body);
+
+        Response response = itemApiClient.createItem(body);
 
         assertEquals(200, response.statusCode());
 
-        ItemDTO item = response.as(ItemDTO.class);
-
-        assertNotNull(item.id());
-        assertEquals(request.sellerId(), item.sellerId());
-        assertEquals(request.name(), item.name());
-        assertEquals(request.price(), item.price());
-        assertNotNull(item.statistics());
-        assertNotNull(item.createdAt());
+        ItemResponse itemResponse = response.as(ItemResponse.class);
+        assertNotNull(itemResponse.status());
+        assertFalse(itemResponse.status().isBlank());
     }
 }

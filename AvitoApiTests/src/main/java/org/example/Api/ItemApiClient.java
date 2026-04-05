@@ -8,29 +8,29 @@ import static io.restassured.RestAssured.given;
 
 public class ItemApiClient {
 
-    public Response createItem(ItemRequest request){
+    public Response createItem(String body){
         return RestAssured.given()
-                .body(request)
-                .post("api/1/item");
+                .body(body)
+                .post("/api/1/item");
     }
 
     public Response getItemById(String id){
         return RestAssured.given()
-                .get("api/1/item/{id}", id);
+                .get("/api/1/item/{id}", id);
     }
 
     public Response getItemBySellerId(String sellerId){
         return RestAssured.given()
-                .get("api/1/{sellerId}/item", sellerId);
+                .get("/api/1/{sellerId}/item", sellerId);
     }
 
     public Response getStatisticsById(String id){
         return RestAssured.given()
-                .get("api/1/statistics/{id}", id);
+                .get("/api/1/statistic/{id}", id);
     }
 
     public Response deleteItemById(String id){
         return RestAssured.given()
-                .delete("api/1/item/{id}", id);
+                .delete("/api/2/item/{id}", id);
     }
 }
