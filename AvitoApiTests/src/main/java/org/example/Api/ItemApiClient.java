@@ -19,7 +19,7 @@ public class ItemApiClient {
                 .get("/api/1/item/{id}", id);
     }
 
-    public Response getItemBySellerId(String sellerId){
+    public Response getItemBySellerId(Object sellerId){
         return RestAssured.given()
                 .get("/api/1/{sellerId}/item", sellerId);
     }
