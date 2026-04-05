@@ -49,7 +49,7 @@ public class GetStatisticsTests  extends BaseApiTest {
     @DisplayName("Получение статистики по несуществующему идентификатору объявления")
     @Description("Проверка ответа API при запросе статистики по несуществующему id")
     public void getStatisticsByUnknownId(){
-        Response response = itemApiClient.getStatisticsById("02f342ff-1bb7-4601-8803-6a7ce7f67c22");
+        Response response = itemApiClient.getStatisticsById("02f342ff-1ddd-4601-8803-6a7ce7f67c22");
         AllureUtils.attachJson("Response body", response.asPrettyString());
 
         assertEquals(404, response.getStatusCode());
@@ -66,10 +66,10 @@ public class GetStatisticsTests  extends BaseApiTest {
     @DisplayName("Получение статистики по идентификатору некорректного формата")
     @Description("Проверка ответа API при запросе статистики по невалидному id")
     public void getStatisticByInvalidId(){
-        Response response = itemApiClient.getItemBySellerId("12325245666");
+        Response response = itemApiClient.getStatisticsById("12325245666");
         AllureUtils.attachJson("Response body", response.asPrettyString());
 
-        assertEquals(404, response.getStatusCode());
+        assertEquals(400, response.getStatusCode());
         assertFalse(response.asString().isBlank());
 
         ErrorResponse errorResponse = response.as(ErrorResponse.class);

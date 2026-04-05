@@ -5,7 +5,7 @@ import io.restassured.response.Response;
 import org.example.Api.BaseApiTest;
 import org.example.Api.ItemApiClient;
 import org.example.Dto.ErrorResponse;
-import org.example.Dto.ItemResponse;
+import org.example.Dto.ItemDTO;
 import org.example.Utils.AllureUtils;
 import org.example.Utils.ItemDataProvider;
 import org.example.Utils.SellerIdGenerator;
@@ -35,9 +35,19 @@ public class CreateItemTests extends BaseApiTest {
 
         assertEquals(200, response.statusCode());
 
-        ItemResponse itemResponse = response.as(ItemResponse.class);
-        assertNotNull(itemResponse.status());
-        assertFalse(itemResponse.status().isBlank());
+        ItemDTO itemResponse = response.as(ItemDTO.class);
+
+        assertNotNull(itemResponse);
+        assertFalse(itemResponse.id().isBlank());
+
+        assertEquals(sellerId, itemResponse.sellerId());
+        assertNotNull(itemResponse.name());
+        assertFalse(itemResponse.name().isBlank());
+
+        assertNotNull(itemResponse.price());
+        assertNotNull(itemResponse.statistics());
+        assertNotNull(itemResponse.createdAt());
+        assertFalse(itemResponse.createdAt().isBlank());
     }
 
     @Test
@@ -156,7 +166,7 @@ public class CreateItemTests extends BaseApiTest {
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Создание объявления со значением price равным максимальному значению типа Long")
     @Description("Проверка успешного создания объявления при значение price равному максимальному значению Long")
-    public void createItemWithMaxLongValue(){
+    public void createItemWithMaxLongValue() {
         int sellerId = SellerIdGenerator.generateSellerId();
         String body = ItemDataProvider.maxLong(sellerId);
         AllureUtils.attachJson("Request body", body);
@@ -166,27 +176,49 @@ public class CreateItemTests extends BaseApiTest {
 
         assertEquals(200, response.statusCode());
 
-        ItemResponse itemResponse = response.as(ItemResponse.class);
-        assertNotNull(itemResponse.status());
-        assertFalse(itemResponse.status().isBlank());
+        ItemDTO item = response.as(ItemDTO.class);
+
+        assertNotNull(item.id());
+        assertFalse(item.id().isBlank());
+
+        assertEquals(sellerId, item.sellerId());
+        assertEquals(Long.MAX_VALUE, Long.valueOf(item.price()));
+
+        assertNotNull(item.name());
+        assertFalse(item.name().isBlank());
+
+        assertNotNull(item.statistics());
+        assertNotNull(item.createdAt());
+        assertFalse(item.createdAt().isBlank());
     }
 
     @Test
-    @Story("Граничные значения")
+    @Story("Позитивный сценарий")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Создание объявления со слишком длинным name")
     @Description("Проверка создания объявления с очень длинным значением поля name")
-    public void createItemWithLongName(){
+    public void createItemWithLongName() {
         int sellerId = SellerIdGenerator.generateSellerId();
         String body = ItemDataProvider.longName(sellerId);
         AllureUtils.attachJson("Request body", body);
 
         Response response = itemApiClient.createItem(body);
         AllureUtils.attachJson("Response body", response.asPrettyString());
+
         assertEquals(200, response.statusCode());
 
-        ItemResponse itemResponse = response.as(ItemResponse.class);
-        assertNotNull(itemResponse.status());
-        assertFalse(itemResponse.status().isBlank());
+        ItemDTO item = response.as(ItemDTO.class);
+
+        assertNotNull(item.id());
+        assertFalse(item.id().isBlank());
+
+        assertEquals(sellerId, item.sellerId());
+        assertNotNull(item.name());
+        assertFalse(item.name().isBlank());
+
+        assertNotNull(item.price());
+        assertNotNull(item.statistics());
+        assertNotNull(item.createdAt());
+        assertFalse(item.createdAt().isBlank());
     }
 }
