@@ -12,4 +12,5 @@ public final class PathUtils {
     public static final String OVERFLOW_INTEGER_JSON = "TestData/overflow-integer.json";
     public static final String OVERFLOW_LONG_JSON = "TestData/overflow-long.json";
     public static final String MAX_LONG_JSON = "TestData/max-long.json";
+    public static final String LONG_NAME = "TestData/long-name.json";
 }

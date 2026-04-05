@@ -54,4 +54,11 @@ public final class ItemDataProvider {
                 Map.of("sellerId", String.valueOf(sellerId))
         );
     }
+
+    public static String longName(int sellerId) {
+        return JsonDataReader.readJsonAndReplace(
+                PathUtils.LONG_NAME,
+                Map.of("sellerId", String.valueOf(sellerId))
+        );
+    }
 }

@@ -4,6 +4,7 @@ import io.qameta.allure.*;
 import io.restassured.response.Response;
 import org.example.Api.BaseApiTest;
 import org.example.Api.ItemApiClient;
+import org.example.Dto.ErrorResponse;
 import org.example.Dto.ItemResponse;
 import org.example.Utils.AllureUtils;
 import org.example.Utils.ItemDataProvider;
@@ -49,6 +50,143 @@ public class CreateItemTests extends BaseApiTest {
         AllureUtils.attachJson("Response body", response.asPrettyString());
 
         assertEquals(400, response.statusCode());
-        assertEquals(response.asString());
+        ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertNotNull(errorResponse.result());
+        assertNotNull(errorResponse.result().message());
+    }
+
+    @Test
+    @Story("Негативный сценарий")
+    @Severity(SeverityLevel.NORMAL)
+    @DisplayName("Создание объявления без sellerId")
+    @Description("Проверка ошибки при отсутствии обязательного поля sellerId")
+    public void createItemWithSellerId(){
+        String body = ItemDataProvider.missingSellerId();
+        AllureUtils.attachJson("Request body", body);
+
+        Response response = itemApiClient.createItem(body);
+        AllureUtils.attachJson("Response body", response.asPrettyString());
+
+        assertEquals(400, response.statusCode());
+
+        ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertNotNull(errorResponse.result());
+        assertNotNull(errorResponse.result().message());
+    }
+
+    @Test
+    @Story("Негативный сценарий")
+    @Severity(SeverityLevel.NORMAL)
+    @DisplayName("Создание объявления с некорректным типом поля price")
+    @Description("Проверка ошибки при передаче price как числа с плавающей точкой")
+    public void createItemWithInvalidPriceValue(){
+        int sellerId = SellerIdGenerator.generateSellerId();
+        String body = ItemDataProvider.invalidPriceType(sellerId);
+        AllureUtils.attachJson("Request body", body);
+
+        Response response = itemApiClient.createItem(body);
+        AllureUtils.attachJson("Response body", response.asPrettyString());
+
+        assertEquals(400, response.statusCode());
+
+        ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertNotNull(errorResponse.result());
+        assertNotNull(errorResponse.result().message());
+
+    }
+
+    @Test
+    @Story("Негативный сценарий")
+    @Severity(SeverityLevel.NORMAL)
+    @DisplayName("Создание объявления с отрицательным значением поля price")
+    @Description("Проверка ошибки при передаче отрцательного значения price")
+    public void createItemWithNegativePrice(){
+        int sellerId = SellerIdGenerator.generateSellerId();
+        String body = ItemDataProvider.negativePrice(sellerId);
+        AllureUtils.attachJson("Request body", body);
+
+        Response response = itemApiClient.createItem(body);
+        AllureUtils.attachJson("Response body", response.asPrettyString());
+
+        assertEquals(400, response.statusCode());
+
+        ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertNotNull(errorResponse.result());
+        assertNotNull(errorResponse.result().message());
+    }
+
+    @Test
+    @Story("Негативный сценарий")
+    @Severity(SeverityLevel.CRITICAL)
+    @DisplayName("Создание объявления со значением price выше диапазона integer")
+    @Description("Проверка ошибки при передаче price больше максимального значения Integer")
+    public void createItemWithOverflowIntegerValue(){
+        int sellerId = SellerIdGenerator.generateSellerId();
+        String body = ItemDataProvider.overflowInteger(sellerId);
+        AllureUtils.attachJson("Request body", body);
+
+        Response response = itemApiClient.createItem(body);
+        AllureUtils.attachJson("Response body", response.asPrettyString());
+
+        assertEquals(400, response.statusCode());
+        ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertNotNull(errorResponse.result());
+    }
+
+    @Test
+    @Story("Негативный сценарий")
+    @Severity(SeverityLevel.NORMAL)
+    @DisplayName("Создание объявления со значением price выше диапазона long")
+    @Description("Проверка ошибки при передаче price больше максимального значения Long")
+    public void createItemWithOverflowLongValue(){
+        int sellerId = SellerIdGenerator.generateSellerId();
+        String body = ItemDataProvider.overflowLong(sellerId);
+        AllureUtils.attachJson("Request body", body);
+
+        Response response = itemApiClient.createItem(body);
+        AllureUtils.attachJson("Response body", response.asPrettyString());
+        assertEquals(400, response.statusCode());
+
+        ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertNotNull(errorResponse.result());
+    }
+
+    @Test
+    @Story("Позитивный сценарий")
+    @Severity(SeverityLevel.NORMAL)
+    @DisplayName("Создание объявления со значением price равным максимальному значению типа Long")
+    @Description("Проверка успешного создания объявления при значение price равному максимальному значению Long")
+    public void createItemWithMaxLongValue(){
+        int sellerId = SellerIdGenerator.generateSellerId();
+        String body = ItemDataProvider.maxLong(sellerId);
+        AllureUtils.attachJson("Request body", body);
+
+        Response response = itemApiClient.createItem(body);
+        AllureUtils.attachJson("Response body", response.asPrettyString());
+
+        assertEquals(200, response.statusCode());
+
+        ItemResponse itemResponse = response.as(ItemResponse.class);
+        assertNotNull(itemResponse.status());
+        assertFalse(itemResponse.status().isBlank());
+    }
+
+    @Test
+    @Story("Граничные значения")
+    @Severity(SeverityLevel.MINOR)
+    @DisplayName("Создание объявления со слишком длинным name")
+    @Description("Проверка создания объявления с очень длинным значением поля name")
+    public void createItemWithLongName(){
+        int sellerId = SellerIdGenerator.generateSellerId();
+        String body = ItemDataProvider.longName(sellerId);
+        AllureUtils.attachJson("Request body", body);
+
+        Response response = itemApiClient.createItem(body);
+        AllureUtils.attachJson("Response body", response.asPrettyString());
+        assertEquals(200, response.statusCode());
+
+        ItemResponse itemResponse = response.as(ItemResponse.class);
+        assertNotNull(itemResponse.status());
+        assertFalse(itemResponse.status().isBlank());
     }
 }
